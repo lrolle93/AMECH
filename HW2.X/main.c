@@ -60,44 +60,5 @@ int main() {
         // Sets B4 to an input
          
 
-    while (1) {
-        // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
-        // remember the core timer runs at half the sysclk
-     
         
-       if (PORTBbits.RB4 == 0) {
-           // if Button is pushed
-           
-       LATAbits.LATA4 = 1;
-       // Turn LED on
-       
-       _CP0_SET_COUNT(0);
-       // Start your timer
-       
-       while (_CP0_GET_COUNT()<12000000)  {
-           // While timer is less than 0.5 seconds, 24 mil is 1 second
-       }
-       
-        LATAbits.LATA4 = 0;
-        // turn LED off, repeat process to blink
-                                   
-   _CP0_SET_COUNT(0);
-       
-       while (_CP0_GET_COUNT()<12000000)  {
-           
-       }
-   
-   LATAbits.LATA4 = 1;
-   
-    _CP0_SET_COUNT(0);
-       
-       while (_CP0_GET_COUNT()<12000000)  {
-           
-       }
-   
-   LATAbits.LATA4 = 0;
-   
-        }
-        
-       }
 }
