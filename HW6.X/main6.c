@@ -92,22 +92,22 @@ int main() {
     while (1){
     
         setpin (0b01000000, IODIR, 0b01111111);
-        setpin (0b01000000, OLAT, 0b00000000);
-        
+              
          
          
-         reading = readpin(0b0100000, GPIO);
+         reading = readpin(0b01000000, GPIO);
          
          if (reading&0b0==0b0){
              setpin (0b01000000, OLAT, 0b10000000);
-         } /* else {
-            setpin (0b01000000, OLAT, 0b10000000);
+         }  else
+         {
+            setpin (0b01000000, OLAT, 0b00000000); 
          };
-         */
-         blink();
+         
+         
     
     
-    
+    blink();
     
     
     
@@ -184,10 +184,10 @@ void setpin (unsigned char address, unsigned char reg, unsigned char value){
 unsigned char readpin (unsigned char address, unsigned char reg){
     //Read function
     i2c_master_start(); // start
-    i2c_master_send(address<<1); // tell we are going to read
+    i2c_master_send(address); // tell we are going to read
     i2c_master_send(reg); // select register
     i2c_master_restart(); // restart
-    i2c_master_send(address<<1|0b1); // say where reading from
+    i2c_master_send(address|0b1); // say where reading from
     unsigned char reading = i2c_master_recv(); //stake reading
     i2c_master_ack(1); //acknowledge
     i2c_master_stop(); //stop
