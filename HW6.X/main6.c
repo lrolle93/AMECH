@@ -78,27 +78,39 @@ int main() {
       
   
        
-       
+    TRISBbits.TRISB4 =1;
+    //Sets B4 to an input
        TRISAbits.TRISA4 = 0;
        // Sets A4 to an output 
     
     
       
    i2c_master_setup();
+   unsigned char reading;
     
        
     while (1){
-     
+    
+        setpin (0b01000000, IODIR, 0b01111111);
+        setpin (0b01000000, OLAT, 0b00000000);
         
+         
+         
+         reading = readpin(0b0100000, GPIO);
+         
+         if (reading&0b0==0b0){
+             setpin (0b01000000, OLAT, 0b10000000);
+         } /* else {
+            setpin (0b01000000, OLAT, 0b10000000);
+         };
+         */
+         blink();
     
-    setpin (0b01000000, IODIR, 0b01111111);
-    setpin (0b01000000, OLAT, 0b10000000);
-    blink();
-    readpin (0b01000000, GPIO);
     
-      
-    sprintf(buf,"i2c read out 0x%x\r\n",readpin);
-    writeUART1(buf);
+    
+    
+    
+    
 }
 }
 
@@ -172,10 +184,10 @@ void setpin (unsigned char address, unsigned char reg, unsigned char value){
 unsigned char readpin (unsigned char address, unsigned char reg){
     //Read function
     i2c_master_start(); // start
-    i2c_master_send(address); // tell we are going to read
+    i2c_master_send(address<<1); // tell we are going to read
     i2c_master_send(reg); // select register
     i2c_master_restart(); // restart
-    i2c_master_send(address<<1|0b0000000001); // say were reading from
+    i2c_master_send(address<<1|0b1); // say where reading from
     unsigned char reading = i2c_master_recv(); //stake reading
     i2c_master_ack(1); //acknowledge
     i2c_master_stop(); //stop
@@ -188,7 +200,7 @@ void blink (void){
       //A4 goes high
       _CP0_SET_COUNT(0); 
       //start timer        
-      while (_CP0_GET_COUNT()<12000000)  {
+      while (_CP0_GET_COUNT()<1200000)  {
            // While timer is less than 0.5 seconds, 24 mil is 1 second
                    
        }
@@ -197,7 +209,7 @@ void blink (void){
        _CP0_SET_COUNT(0);
        //restart timer
        
-        while (_CP0_GET_COUNT()<12000000){
+        while (_CP0_GET_COUNT()<1200000){
            // While timer is less than 0.5 seconds, 24 mil is 1 second
           
                  }
