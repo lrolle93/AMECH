@@ -83,7 +83,8 @@ int main() {
        TRISAbits.TRISA4 = 0;
        // Sets A4 to an output 
     
-    
+  
+   
       
    i2c_master_setup();
    unsigned char reading;
