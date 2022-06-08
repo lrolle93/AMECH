@@ -2,7 +2,7 @@
 
 #include "ws2812b.h"
 // other includes if necessary for debugging
-
+#include<xc.h>
 // Timer2 delay times, you can tune these if necessary
 #include<sys/attribs.h>  // __ISR macro
 #include <stdio.h>
@@ -48,6 +48,7 @@ void ws2812b_setup();
 void ws2812b_setColor(wsColor * c, int numLEDs);
 void blink();
 
+
 int main(){
     
     __builtin_disable_interrupts(); // disable interrupts while initializing things
@@ -68,37 +69,91 @@ int main(){
     
     TRISAbits.TRISA4 = 0;
     LATAbits.LATA4 = 1;
+    
 
-    
-    
     ws2812b_setup();
+    //float w[6] = {0,60,120,180,240,300};
+    //float w[3] = {0,120,240};
+    wsColor c[4];
+    //FOR setting each individual LED
+//    c[0].r = 255;
+//    c[0].b=0;
+//    c[0].g=0;
+//    c[1].r = 0;
+//    c[1].b=255;
+//    c[1].g=0;
+//    c[2].r = 0;
+//    c[2].b=0;
+//    c[2].g=255;
+//    c[2].r = 0;
+//    c[2].b=0;
+//    c[2].g=255;
+//    c[3].r = 255;
+//    c[3].b=255;
+//    c[3].g=255;
     
-    while(1){
+    c[0] = HSBtoRGB( 0, 1 , 0.5);
+    c[1] = HSBtoRGB(60 , 1 , 0.5);
+    c[2] = HSBtoRGB(120 , 1 , 0.5);
+    c[3] = HSBtoRGB(180 , 1 , 0.5);
+    
+ int i =0;
+int j =0;
+int k=0;
+int m=0;
+   
+   
+    
+   while (1) {
+ 
+        blink(); 
         
-        blink();
-        //ws2812b_setColor (c ,3);
-    }
+        for (k=0 ; k <= 360 ; k++ ) { 
+          for (m=0; m<=3; m++){  
+//              if (k > 360){
+//                  k=k/360;
+//              }
+//              c[m]= HSBtoRGB((60*m)+k , 1 , 0.5);//% is MOD, which means /360 and keep the remainder
+            c[m]= HSBtoRGB(((60*m)+k)%360 , 1 , 0.5);//% is MOD, which means /360 and keep the remainder
+            ws2812b_setColor(c, 4) ; 
+             
+        }
+          _CP0_SET_COUNT(0);
+        while(_CP0_GET_COUNT()<24000000/200){}
+        }
+       
+        
+                
+                //ws2812b_setColor(c, 4) ; 
+        //}
+        //}
+        //ws2812b_setColor(c, 4) ; 
+        
         
     }
+    
+    
+
+}
 
 
 // setup Timer2 for 48MHz, and setup the output pin
 void ws2812b_setup() {
-    T2CONbits.TCKPS = 1; // Timer2 prescaler N=1 (1:1)
+    T2CONbits.TCKPS = 000; // Timer2 prescaler N=1 (1:1)
     PR2 = 65535; // maximum period
     TMR2 = 0; // initialize Timer2 to 0
     T2CONbits.ON = 1; // turn on Timer2
-    TRISBbits.TRISB2 =0;
-    LATBbits.LATB2 = 1;
+    TRISBbits.TRISB2 = 0;
+    LATBbits.LATB2 = 0;
     
 }
 
- //build an array of high/low times from the color input array, then output the high/low bits
+// build an array of high/low times from the color input array, then output the high/low bits
 void ws2812b_setColor(wsColor * c, int numLEDs) {
     int i = 0; int j = 0; // for loops
     int numBits = 2 * 3 * 8 * numLEDs; // the number of high/low bits to store, 2 per color bit
     //volatile unsigned int delay_times[2*3*8 * 5]; // I only gave you 5 WS2812B, adjust this if you get more somewhere
-    volatile unsigned int delay_times[2*3*8 * 3]; // I only gave you 5 WS2812B, I used 3
+    volatile unsigned int delay_times[2*3*8 * 4]; // I only gave you 5 WS2812B, I used 4
     // start at time at 0
     delay_times[0] = 0;
     
@@ -110,7 +165,7 @@ void ws2812b_setColor(wsColor * c, int numLEDs) {
         // loop through each color bit, MSB first
         for (j = 7; j >= 0; j--) {
             // if the bit is a 1
-            if (/* identify the bit in c[].r, is it 1 */) {
+            if ((c[i].r >> j) & 0b1)/* identify the bit in c[].r, is it 1 */ {
                 // the high is longer
                 delay_times[nB] = delay_times[nB - 1] + HIGHTIME;
                 nB++;
@@ -126,12 +181,12 @@ void ws2812b_setColor(wsColor * c, int numLEDs) {
                 nB++;
             }
         }
+    
         //GREEN
-        for (i = 0; i < numLEDs; i++) {
-        // loop through each color bit, MSB first
+        
         for (j = 7; j >= 0; j--) {
             // if the bit is a 1
-            if (/* identify the bit in c[].g, is it 1 */) {
+            if ((c[i].g >> j) & 0b1)/* identify the bit in c[].g, is it 1 */ {
                 // the high is longer
                 delay_times[nB] = delay_times[nB - 1] + HIGHTIME;
                 nB++;
@@ -149,11 +204,10 @@ void ws2812b_setColor(wsColor * c, int numLEDs) {
         }
         
         //BLUE
-        for (i = 0; i < numLEDs; i++) {
-        // loop through each color bit, MSB first
+        
         for (j = 7; j >= 0; j--) {
             // if the bit is a 1
-            if (/* identify the bit in c[].r, is it 1 */) {
+            if ((c[i].b >> j) & 0b1)/* identify the bit in c[].r, is it 1 */ {
                 // the high is longer
                 delay_times[nB] = delay_times[nB - 1] + HIGHTIME;
                 nB++;
@@ -173,17 +227,22 @@ void ws2812b_setColor(wsColor * c, int numLEDs) {
     }
 
     // turn on the pin for the first high/low
-    LATBbits.LATB6 = 1;
+    
+    LATBbits.LATB2 =1;
     TMR2 = 0; // start the timer
     for (i = 1; i < numBits; i++) {
         while (TMR2 < delay_times[i]) {
         }
-        LATBINV = 0b1000000; // invert B6
+        LATBINV = 0b00000100; // invert B2
     }
-    LATBbits.LATB6 = 0;
+    LATBbits.LATB2 = 0;
+    //LATBbits.LATB2 = 0;
     TMR2 = 0;
     while(TMR2 < 2400){} // wait 50uS, reset condition
 }
+    
+
+
 
 // adapted from https://forum.arduino.cc/index.php?topic=8498.0
 // hue is a number from 0 to 360 that describes a color on the color wheel
