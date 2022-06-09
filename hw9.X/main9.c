@@ -75,7 +75,7 @@ int main(){
     //float w[6] = {0,60,120,180,240,300};
     //float w[3] = {0,120,240};
     wsColor c[4];
-    //FOR setting each individual LED
+    //FOR setting each individual LED, and testing 
 //    c[0].r = 255;
 //    c[0].b=0;
 //    c[0].g=0;
@@ -91,6 +91,7 @@ int main(){
 //    c[3].r = 255;
 //    c[3].b=255;
 //    c[3].g=255;
+    
     
     c[0] = HSBtoRGB( 0, 1 , 0.5);
     c[1] = HSBtoRGB(60 , 1 , 0.5);
@@ -143,7 +144,7 @@ void ws2812b_setup() {
     PR2 = 65535; // maximum period
     TMR2 = 0; // initialize Timer2 to 0
     T2CONbits.ON = 1; // turn on Timer2
-    TRISBbits.TRISB2 = 0;
+    TRISBbits.TRISB2 = 0; //LED connected to B2
     LATBbits.LATB2 = 0;
     
 }
